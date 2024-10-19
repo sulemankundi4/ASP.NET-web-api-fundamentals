@@ -8,5 +8,15 @@
 
         public string? Description { get; set; }
 
+        public int NumberOfPointsOfInterest
+        {
+            get
+            {
+                return PointOfInterest.Count;
+            }
+        }
+
+        public ICollection<PointOfInterestDto> PointOfInterest { get; set; } = new List<PointOfInterestDto>();
+
     }
 }

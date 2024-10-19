@@ -1,10 +1,24 @@
 // WebApplication Builder ko command line arguments ke sath initialize karen
 // Ye line application ke configuration aur services ko setup karne ke liye builder object create karti hai
+using Microsoft.AspNetCore.StaticFiles;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Controllers ke liye zaroori services add karen
 // Ye line ASP.NET Core MVC controllers ko application mein use karne ke liye services add karti hai
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.ReturnHttpNotAcceptable = true;
+}).AddXmlDataContractSerializerFormatters();
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        context.ProblemDetails.Extensions.Add("additionalInfo", "Additional information about the problem.");
+        context.ProblemDetails.Extensions.Add("server", Environment.MachineName);
+    };
+});
 
 // Endpoints API Explorer service add karen
 // Ye line API endpoints ko explore karne ke liye service add karti hai, jo Swagger documentation ke liye zaroori hai
@@ -13,6 +27,8 @@ builder.Services.AddEndpointsApiExplorer();
 // Swagger generation service add karen
 // Ye line Swagger documentation generate karne ke liye service add karti hai, jo API ke endpoints ko document karti hai
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
 // Application ko builder ke zariye build karen
 // Ye line builder object ke configuration ke sath application ko build karti hai
@@ -25,7 +41,7 @@ if (app.Environment.IsDevelopment())
     // Swagger middleware ko enable karen, jo API documentation ko JSON format mein serve karta hai
     app.UseSwagger();
     // Swagger UI middleware ko enable karen, jo web-based interface provide karta hai API ko explore karne ke liye
-    app.UseSwaggerUI();   
+    app.UseSwaggerUI();
 }
 
 // HTTP requests ko HTTPS par redirect karen
