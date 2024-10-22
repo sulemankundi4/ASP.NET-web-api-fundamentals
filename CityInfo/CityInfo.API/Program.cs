@@ -2,7 +2,9 @@
 // Ye line application ke configuration aur services ko setup karne ke liye builder object create karti hai
 using CityInfo.API;
 using CityInfo.API.Services;
+using CItyInfo.API.DBContext;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().WriteTo.File("logs/cityinfo.txt", rollingInterval: RollingInterval.Day).CreateLogger();
@@ -44,7 +46,7 @@ builder.Services.AddSingleton<CitiesDataStore>();
 
 //OUR OWN SERVICES
 builder.Services.AddTransient<IMailService, LocalMailService>();
-
+builder.Services.AddDbContext<CityInfoContext>(DbContextOptions => DbContextOptions.UseSqlite("Data Source=CityInfo.db"));
 ///////////////
 
 

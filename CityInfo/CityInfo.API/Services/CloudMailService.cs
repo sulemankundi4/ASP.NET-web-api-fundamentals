@@ -4,8 +4,14 @@ namespace CItyInfo.API.Services
 {
     public class CloudMailService : IMailService
     {
-        private string _mailTo = "admin@gmail.com";
-        private string _mailFrom = "user@gmail.com";
+        private string _mailTo = "";
+        private string _mailFrom = "";
+
+        public CloudMailService(IConfiguration configuration)
+        {
+            _mailTo = configuration["mailSettings:mailToAddress"];
+            _mailFrom = configuration["mailSettings:mailFromAddress"];
+        }
 
         public void Send(string subject, string message)
         {
