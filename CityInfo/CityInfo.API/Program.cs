@@ -1,8 +1,15 @@
 // WebApplication Builder ko command line arguments ke sath initialize karen
 // Ye line application ke configuration aur services ko setup karne ke liye builder object create karti hai
+using CityInfo.API;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().WriteTo.File("logs/cityinfo.txt", rollingInterval: RollingInterval.Day).CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // Controllers ke liye zaroori services add karen
 // Ye line ASP.NET Core MVC controllers ko application mein use karne ke liye services add karti hai
@@ -11,14 +18,16 @@ builder.Services.AddControllers(options =>
     options.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 
-builder.Services.AddProblemDetails(options =>
-{
-    options.CustomizeProblemDetails = context =>
-    {
-        context.ProblemDetails.Extensions.Add("additionalInfo", "Additional information about the problem.");
-        context.ProblemDetails.Extensions.Add("server", Environment.MachineName);
-    };
-});
+builder.Services.AddProblemDetails();
+
+//builder.Services.AddProblemDetails(options =>
+//{
+//    options.CustomizeProblemDetails = context =>
+//    {
+//        context.ProblemDetails.Extensions.Add("additionalInfo", "Additional information about the problem.");
+//        context.ProblemDetails.Extensions.Add("server", Environment.MachineName);
+//    };
+//});
 
 // Endpoints API Explorer service add karen
 // Ye line API endpoints ko explore karne ke liye service add karti hai, jo Swagger documentation ke liye zaroori hai
@@ -28,11 +37,25 @@ builder.Services.AddEndpointsApiExplorer();
 // Ye line Swagger documentation generate karne ke liye service add karti hai, jo API ke endpoints ko document karti hai
 builder.Services.AddSwaggerGen();
 
+
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
+
+builder.Services.AddSingleton<CitiesDataStore>();
+
+//OUR OWN SERVICES
+builder.Services.AddTransient<IMailService, LocalMailService>();
+
+///////////////
+
 
 // Application ko builder ke zariye build karen
 // Ye line builder object ke configuration ke sath application ko build karti hai
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler();
+}
 
 // Agar application development environment mein hai to Swagger aur Swagger UI use karen
 // Ye block check karta hai agar application development environment mein hai, to Swagger aur Swagger UI ko enable karta hai
