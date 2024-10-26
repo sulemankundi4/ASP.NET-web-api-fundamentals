@@ -1,8 +1,9 @@
 // WebApplication Builder ko command line arguments ke sath initialize karen
 // Ye line application ke configuration aur services ko setup karne ke liye builder object create karti hai
 using CityInfo.API;
+using CityInfo.API.DBContext;
 using CityInfo.API.Services;
-using CItyInfo.API.DBContext;
+using CItyInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -46,7 +47,9 @@ builder.Services.AddSingleton<CitiesDataStore>();
 
 //OUR OWN SERVICES
 builder.Services.AddTransient<IMailService, LocalMailService>();
-builder.Services.AddDbContext<CityInfoContext>(DbContextOptions => DbContextOptions.UseSqlite("Data Source=CityInfo.db"));
+builder.Services.AddScoped<ICityInfoRepository, CityInfoRepository>();
+builder.Services.AddDbContext<CityInfoContext>(options =>
+    options.UseSqlite(builder.Configuration["ConnectionStrings:CityInfoDBConnectionString"]));
 ///////////////
 
 

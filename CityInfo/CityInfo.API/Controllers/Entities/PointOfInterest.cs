@@ -12,6 +12,8 @@ namespace CityInfo.API.Controllers.Entities
       [MaxLength(50)]
       public string Name { get; set; }
 
+      public string? Description { get; set; }
+
       [ForeignKey("CityId")]
       public City? City { get; set; }
 

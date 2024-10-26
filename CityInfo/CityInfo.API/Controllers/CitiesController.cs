@@ -1,5 +1,7 @@
 ﻿using CityInfo.API.Models;
+using CItyInfo.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace CityInfo.API.Controllers
 {
@@ -7,30 +9,42 @@ namespace CityInfo.API.Controllers
     [Route("api/cities")]
     public class CitiesController : ControllerBase
     {
-        private readonly CitiesDataStore _citiesDataStore;
-
-        public CitiesController(CitiesDataStore cityDataStore)
+        private readonly ICityInfoRepository _cityInfoRepository;
+        public CitiesController(ICityInfoRepository cityInfoRepository)
         {
-            _citiesDataStore = cityDataStore ?? throw new ArgumentNullException(nameof(cityDataStore));
+            _cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CityDto>> GetCities()
+        public async Task<ActionResult<IEnumerable<CityWithoutPointOfInterest>>> GetCities()
         {
-            return Ok(_citiesDataStore.Cities);
-        }
+            var citiesEntities = await _cityInfoRepository.GetCitiesAsync();
 
-        [HttpGet("{id}")]
-        public ActionResult<CityDto> GetCity(int id)
-        {
-            var CityToReturn = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == id);
-
-            if (CityToReturn == null)
+            var result = new List<CityWithoutPointOfInterest>();
+            foreach (var cityEntity in citiesEntities)
             {
-                return NotFound();
+                result.Add(new CityWithoutPointOfInterest
+                {
+                    Id = cityEntity.Id,
+                    Name = cityEntity.Name,
+                    Description = cityEntity.Description
+                });
             }
 
-            return Ok(CityToReturn);
+            return Ok(result);
         }
+
+        // [HttpGet("{id}")]
+        // public ActionResult<CityDto> GetCity(int id)
+        // {
+        //     var CityToReturn = _citiesDataStore.Cities.FirstOrDefault(c => c.Id == id);
+
+        //     if (CityToReturn == null)
+        //     {
+        //         return NotFound();
+        //     }
+
+        //     return Ok(CityToReturn);
+        // }
     }
 }
