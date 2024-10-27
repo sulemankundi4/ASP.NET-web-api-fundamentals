@@ -42,8 +42,8 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
-
 builder.Services.AddSingleton<CitiesDataStore>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //OUR OWN SERVICES
 builder.Services.AddTransient<IMailService, LocalMailService>();
