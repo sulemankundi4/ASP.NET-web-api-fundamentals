@@ -17,6 +17,5 @@
         }
 
         public ICollection<PointOfInterestDto> PointOfInterest { get; set; } = new List<PointOfInterestDto>();
-
     }
 }

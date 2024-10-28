@@ -15,11 +15,12 @@ namespace CityInfo.API.Controllers.Entities
         [MaxLength(200)]
         public string Description { get; set; }
 
-        public ICollection<PointOfInterest> PointOfInterest { get; set; } = new List<PointOfInterest>();
+        public ICollection<PointOfInterest> PointsOfInterest { get; set; } = new List<PointOfInterest>();
 
         public City(string name)
         {
             Name = name;
+            PointsOfInterest = new List<PointOfInterest>();
         }
     }
 }
